@@ -397,6 +397,31 @@
     .ranking-section .tiered-leaderboard{grid-template-columns:repeat(5,minmax(190px,1fr))}
   }
 
+
+  /* Wider gamemode tier cards; use the available viewport width. */
+  .ranking-section{
+    width:min(1500px,calc(100vw - 32px));
+    margin-left:50%;
+    transform:translateX(-50%);
+  }
+  .ranking-section .tiered-leaderboard{
+    grid-template-columns:repeat(5,minmax(260px,1fr));
+    width:100%;
+  }
+  .ranking-section .tier-section{min-width:260px}
+  .ranking-section .mode-rank-row{
+    grid-template-columns:44px minmax(0,1fr) auto;
+    padding:14px;
+  }
+  .ranking-section .mode-rank-row > .rank{display:none}
+  .ranking-section .mode-rank-row .meta{display:none}
+  .ranking-section .mode-rank-row{cursor:pointer}
+  @media(max-width:760px){
+    .ranking-section{width:calc(100vw - 24px)}
+    .ranking-section .tiered-leaderboard{grid-template-columns:repeat(5,minmax(245px,1fr))}
+    .ranking-section .tier-section{min-width:245px}
+  }
+
 </style>
 </head>
 <body>
@@ -3321,6 +3346,7 @@
     });
   });
 
+
   showView(location.hash.slice(1) || 'overall', false);
 
   const playerCards = Array.from(document.querySelectorAll('#overall details.player'));
@@ -3328,6 +3354,23 @@
     card.querySelector('summary .name').textContent.trim().toLowerCase(),
     card
   ]));
+
+  document.querySelectorAll('.ranking-section .mode-rank-row').forEach(row => {
+    row.setAttribute('tabindex','0');
+    row.setAttribute('role','button');
+    const openModeProfile = () => {
+      const name = row.querySelector('.name')?.textContent.trim().toLowerCase();
+      const card = name ? byName.get(name) : null;
+      if (card) openPlayer(card);
+    };
+    row.addEventListener('click', openModeProfile);
+    row.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openModeProfile();
+      }
+    });
+  });
 
   const form = document.getElementById('playerSearchForm');
   const input = document.getElementById('playerSearchInput');
