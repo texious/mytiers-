@@ -3340,6 +3340,42 @@
     return match ? Number(match[1]) : 99;
   }
 
+  // Keep gamemode leaderboard entries synchronized with each player's profile.
+  const profileTierState = new Map();
+  document.querySelectorAll('#overall details.player').forEach(card => {
+    const name = card.querySelector('summary .name')?.textContent.trim().toLowerCase();
+    if (!name) return;
+    const modes = {};
+    card.querySelectorAll('.profile .tierrow').forEach(row => {
+      const icon = row.querySelector('.mode-icon');
+      const badge = row.querySelector('.badge');
+      if (!icon || !badge) return;
+      const modeClass = Array.from(icon.classList).find(c => c.startsWith('mode-') && c !== 'mode-icon');
+      if (!modeClass) return;
+      modes[modeClass.slice(5)] = {
+        tier: badge.textContent.trim().toUpperCase(),
+        retired: badge.classList.contains('retired-tier')
+      };
+    });
+    profileTierState.set(name, modes);
+  });
+
+  document.querySelectorAll('.ranking-section').forEach(section => {
+    const mode = section.id;
+    if (!mode) return;
+    section.querySelectorAll('.mode-rank-row').forEach(row => {
+      const name = row.querySelector('.name')?.textContent.trim().toLowerCase();
+      const state = name ? profileTierState.get(name)?.[mode] : null;
+      const badge = row.querySelector('.badge');
+      if (!state || !badge) return;
+      badge.textContent = state.tier;
+      badge.className = 'badge tier-' + state.tier.toLowerCase() + (state.retired ? ' retired-tier' : '');
+      row.classList.toggle('retired-player-row', state.retired);
+      row.classList.toggle('high-tier-row', !state.retired && state.tier.startsWith('HT'));
+      row.classList.toggle('low-tier-row', !state.retired && state.tier.startsWith('LT'));
+    });
+  });
+
   document.querySelectorAll('.ranking-section .tiered-leaderboard').forEach(board => {
     const retired = board.querySelector('.retired-section');
     if (retired) {
@@ -3364,6 +3400,27 @@
       el.classList.contains('tier-section') && !el.classList.contains('retired-section')
     );
     tierSections.sort((a,b) => tierNumber(a) - tierNumber(b)).forEach(el => board.appendChild(el));
+    // Move every active row to the section matching its current tier.
+    Array.from(board.querySelectorAll('.mode-rank-row:not(.retired-player-row)')).forEach(row => {
+      const badge = row.querySelector('.badge');
+      if (!badge) return;
+      const tierText = badge.textContent.trim().toUpperCase();
+      const num = tierText.slice(-1);
+      const target = Array.from(board.querySelectorAll('.tier-section')).find(sec =>
+        !sec.classList.contains('retired-section') &&
+        (sec.querySelector('.tier-section-title')?.textContent || '').toUpperCase().includes('TIER ' + num)
+      );
+      const body = target?.querySelector('.tier-section-body');
+      if (body) body.appendChild(row);
+    });
+    Array.from(board.querySelectorAll('.tier-section:not(.retired-section) .tier-section-body')).forEach(body => {
+      const rows = Array.from(body.querySelectorAll('.mode-rank-row'));
+      rows.sort((a,b) => {
+        const at = a.querySelector('.badge')?.textContent.trim().toUpperCase() || '';
+        const bt = b.querySelector('.badge')?.textContent.trim().toUpperCase() || '';
+        return (at.startsWith('HT') ? 0 : 1) - (bt.startsWith('HT') ? 0 : 1);
+      }).forEach(row => body.appendChild(row));
+    });
     Array.from(board.children)
       .filter(el => el.classList.contains('retired-section'))
       .forEach(el => board.appendChild(el));
