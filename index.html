@@ -646,11 +646,11 @@
           <div class="name">Swight</div>
           <div class="meta"><span class="region-na">NA</span> · Combat Master</div>
         </div>
-        <div class="pts">290</div>
+        <div class="pts">304</div>
       </summary>
       <div class="profile">
         <h3>Swight</h3>
-        <div class="title">Combat Master · 290 points</div>
+        <div class="title">Combat Master · 304 points</div>
         <div class="tiers"><div class="tierrow"><div class="mode-line"><span class="mode-icon mode-vanilla">
 <svg viewBox="0 0 24 24" aria-hidden="true">
   <rect x="7.5" y="16.5" width="9" height="2" rx="1" fill="#60545f"/>
@@ -3341,6 +3341,25 @@
   }
 
   document.querySelectorAll('.ranking-section .tiered-leaderboard').forEach(board => {
+    const retired = board.querySelector('.retired-section');
+    if (retired) {
+      Array.from(retired.querySelectorAll('.mode-rank-row')).forEach(row => {
+        const badge=row.querySelector('.badge');
+        if (!badge || badge.classList.contains('retired-tier')) return;
+        const tierText=badge.textContent.trim().toUpperCase();
+        const num=tierText.slice(-1);
+        const target=Array.from(board.querySelectorAll('.tier-section')).find(sec =>
+          !sec.classList.contains('retired-section') &&
+          (sec.querySelector('.tier-section-title')?.textContent || '').toUpperCase().includes('TIER '+num)
+        );
+        const body=target?.querySelector('.tier-section-body');
+        if (body) {
+          row.classList.remove('retired-player-row');
+          row.classList.add(tierText.startsWith('HT') ? 'high-tier-row' : 'low-tier-row');
+          body.appendChild(row);
+        }
+      });
+    }
     const tierSections = Array.from(board.children).filter(el =>
       el.classList.contains('tier-section') && !el.classList.contains('retired-section')
     );
