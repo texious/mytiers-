@@ -3387,6 +3387,25 @@
 
   showView(location.hash.slice(1) || 'overall', false);
 
+  function sortProfileTiers(container) {
+    if (!container) return;
+    const rows = Array.from(container.children);
+    const tierValue = row => {
+      const badge = row.querySelector('.badge');
+      if (!badge) return 999;
+      const text = badge.textContent.trim().toUpperCase();
+      const m = text.match(/^(HT|LT)([1-5])$/);
+      if (!m) return 998;
+      const retired = badge.classList.contains('retired-tier') ? 100 : 0;
+      const tier = Number(m[2]);
+      const highLow = m[1] === 'HT' ? 0 : 1;
+      return retired + ((tier - 1) * 2) + highLow;
+    };
+    rows.sort((a,b) => tierValue(a) - tierValue(b)).forEach(row => container.appendChild(row));
+  }
+
+  document.querySelectorAll('#overall .profile .tiers').forEach(sortProfileTiers);
+
   const playerCards = Array.from(document.querySelectorAll('#overall details.player'));
   const byName = new Map(playerCards.map(card => [
     card.querySelector('summary .name').textContent.trim().toLowerCase(),
@@ -3458,6 +3477,7 @@
     modalMeta.textContent = meta;
     modalPoints.textContent = points;
     modalTiers.innerHTML = tiers?.innerHTML || '';
+    sortProfileTiers(modalTiers);
 
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
