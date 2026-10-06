@@ -431,6 +431,11 @@
   .region-au{color:#ffd84d !important}
   .region-me{color:#ff8a2a !important}
 
+
+  #overall details.player > summary{cursor:pointer;list-style:none}
+  #overall details.player > summary::-webkit-details-marker{display:none}
+  #overall details.player > .profile{display:none !important}
+
 </style>
 </head>
 <body>
@@ -3363,6 +3368,25 @@
     card.querySelector('summary .name').textContent.trim().toLowerCase(),
     card
   ]));
+
+  playerCards.forEach(card => {
+    const summary = card.querySelector('summary');
+    if (!summary) return;
+    summary.setAttribute('role','button');
+    summary.setAttribute('aria-expanded','false');
+    summary.addEventListener('click', function(e) {
+      e.preventDefault();
+      card.removeAttribute('open');
+      openPlayer(card);
+    });
+    summary.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        card.removeAttribute('open');
+        openPlayer(card);
+      }
+    });
+  });
 
   document.querySelectorAll('.ranking-section .mode-rank-row').forEach(row => {
     row.setAttribute('tabindex','0');
