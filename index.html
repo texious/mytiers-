@@ -367,6 +367,36 @@
     overflow:hidden;
   }
 
+
+  /* App-style leaderboard views: only one section is visible at a time. */
+  main.wrap > section{display:none}
+  main.wrap > section.active-view{display:block}
+  .tab.active-tab{background:#d9ff42;color:#101318;border-color:#d9ff42}
+  .ranking-section{padding-top:0;margin-top:0}
+  .ranking-section .back{display:none}
+
+  /* Gamemode leaderboard: Tier 1 -> Tier 5 from left to right. */
+  .ranking-section .tiered-leaderboard{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(210px,1fr));
+    gap:12px;
+    align-items:start;
+    overflow-x:auto;
+    padding-bottom:10px;
+  }
+  .ranking-section .tier-section{min-width:210px}
+  .ranking-section .tier-section-title{text-align:center}
+  .ranking-section .tier-section-body{display:flex;flex-direction:column}
+  .ranking-section .subtier-label.high-label{order:0}
+  .ranking-section .high-tier-row{order:1;background:#1d2732}
+  .ranking-section .subtier-label.low-label{order:2}
+  .ranking-section .low-tier-row{order:3;background:#0d131a}
+  .ranking-section .empty-tier{order:4}
+  .ranking-section .retired-section{grid-column:1/-1}
+  @media(max-width:760px){
+    .ranking-section .tiered-leaderboard{grid-template-columns:repeat(5,minmax(190px,1fr))}
+  }
+
 </style>
 </head>
 <body>
@@ -3256,6 +3286,43 @@
 
 <script>
 (function() {
+
+  const tabs = Array.from(document.querySelectorAll('.tabs .tab'));
+  const views = Array.from(document.querySelectorAll('main.wrap > section'));
+
+  function tierNumber(section) {
+    const label = section.querySelector('.tier-section-title')?.textContent || '';
+    const match = label.match(/TIER\s*([1-5])/i);
+    return match ? Number(match[1]) : 99;
+  }
+
+  document.querySelectorAll('.ranking-section .tiered-leaderboard').forEach(board => {
+    const tierSections = Array.from(board.children).filter(el =>
+      el.classList.contains('tier-section') && !el.classList.contains('retired-section')
+    );
+    tierSections.sort((a,b) => tierNumber(a) - tierNumber(b)).forEach(el => board.appendChild(el));
+    Array.from(board.children)
+      .filter(el => el.classList.contains('retired-section'))
+      .forEach(el => board.appendChild(el));
+  });
+
+  function showView(id, updateHash = true) {
+    const view = document.getElementById(id) || document.getElementById('overall');
+    views.forEach(section => section.classList.toggle('active-view', section === view));
+    tabs.forEach(tab => tab.classList.toggle('active-tab', tab.getAttribute('href') === '#' + view.id));
+    if (updateHash) history.replaceState(null, '', '#' + view.id);
+    window.scrollTo({top:0, behavior:'auto'});
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function(e) {
+      e.preventDefault();
+      showView(this.getAttribute('href').slice(1));
+    });
+  });
+
+  showView(location.hash.slice(1) || 'overall', false);
+
   const playerCards = Array.from(document.querySelectorAll('#overall details.player'));
   const byName = new Map(playerCards.map(card => [
     card.querySelector('summary .name').textContent.trim().toLowerCase(),
