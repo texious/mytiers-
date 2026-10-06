@@ -3406,39 +3406,6 @@
 
   document.querySelectorAll('#overall .profile .tiers').forEach(sortProfileTiers);
 
-  // Recalculate overall points/rank/title from ACTIVE tiers, then reorder the leaderboard.
-  const tierPoints = {LT5:1,HT5:2,LT4:3,HT4:4,LT3:6,HT3:10,LT2:20,HT2:30,LT1:45,HT1:60};
-  const rankTitle = points => points >= 400 ? 'Combat Grandmaster' :
-    points >= 250 ? 'Combat Master' : points >= 100 ? 'Combat Ace' :
-    points >= 50 ? 'Combat Specialist' : points >= 20 ? 'Combat Cadet' :
-    points >= 10 ? 'Combat Novice' : 'Rookie';
-
-  const overallList = document.querySelector('#overall .leaderboard');
-  const overallCards = Array.from(document.querySelectorAll('#overall details.player'));
-  overallCards.forEach(card => {
-    const activeBadges = Array.from(card.querySelectorAll('.profile .tiers .badge:not(.retired-tier)'));
-    const points = activeBadges.reduce((sum,badge) => sum + (tierPoints[badge.textContent.trim().toUpperCase()] || 0), 0);
-    const title = rankTitle(points);
-    const pts = card.querySelector('summary .pts');
-    const meta = card.querySelector('summary .meta');
-    const profileTitle = card.querySelector('.profile .title');
-    if (pts) pts.textContent = points;
-    if (meta) {
-      const region = meta.querySelector('span');
-      meta.innerHTML = (region ? region.outerHTML : '') + (region ? ' · ' : '') + title;
-    }
-    if (profileTitle) profileTitle.textContent = title + ' · ' + points + ' points';
-    card.dataset.points = points;
-  });
-  if (overallList) {
-    overallCards.sort((a,b) => Number(b.dataset.points) - Number(a.dataset.points))
-      .forEach(card => overallList.appendChild(card));
-    Array.from(overallList.querySelectorAll('details.player')).forEach((card,i) => {
-      const rank = card.querySelector('summary .rank');
-      if (rank) rank.textContent = i + 1;
-    });
-  }
-
   const playerCards = Array.from(document.querySelectorAll('#overall details.player'));
   const byName = new Map(playerCards.map(card => [
     card.querySelector('summary .name').textContent.trim().toLowerCase(),
