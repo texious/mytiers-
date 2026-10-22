@@ -3670,6 +3670,36 @@
       message.textContent = '';
       return;
     }
+    if (query.toLowerCase() === 'flowtives') {
+      const tiers = [
+        ['sword','HT3',false], ['pot','HT3',false], ['smp','HT3',false],
+        ['axe','LT3',false], ['mace','LT3',false], ['vanilla','LT3',false],
+        ['nethop','LT2',true], ['uhc','HT1',true]
+      ];
+      const points = 10 + 10 + 10 + 6 + 6 + 6 + 20 + 60;
+      modalHead.innerHTML = '<img class="real-skin-img" src="https://mc-heads.net/avatar/Flowtives/80" alt="Flowtives current Minecraft skin">';
+      modalPlacement.textContent = 'PLAYER PROFILE';
+      modalPlacementStat.textContent = 'Unranked';
+      modalName.textContent = 'Flowtives';
+      modalMeta.textContent = 'Combat Ace';
+      modalPoints.textContent = String(points);
+      const iconTemplates = {};
+      document.querySelectorAll('#overall .profile .mode-icon').forEach(icon => {
+        const mode = Array.from(icon.classList).find(c => c.startsWith('mode-') && c !== 'mode-icon');
+        if (mode && !iconTemplates[mode]) iconTemplates[mode] = icon.innerHTML;
+      });
+      modalTiers.innerHTML = tiers.map(([mode,tier,retired]) =>
+        '<div class="tierrow"><div class="mode-line"><span class="mode-icon mode-' + mode + '">' +
+        (iconTemplates['mode-' + mode] || '') + '</span></div><div class="badge tier-' +
+        tier.toLowerCase() + (retired ? ' retired-tier' : '') + '">' + tier + '</div></div>'
+      ).join('');
+      sortProfileTiers(modalTiers);
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      document.body.classList.add('modal-open');
+      message.textContent = '';
+      return;
+    }
     const card = byName.get(query.toLowerCase());
     if (!card) {
       message.textContent = 'No exact player match found.';
