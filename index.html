@@ -3554,6 +3554,30 @@
       message.textContent = 'Enter an exact IGN.';
       return;
     }
+    if (query.toLowerCase() === 'vortexious') {
+      const tiers = [
+        ['sword','HT3'], ['uhc','LT3'], ['smp','LT3'], ['pot','LT3'],
+        ['mace','HT4']
+      ];
+      const points = 10 + 6 + 6 + 6 + 4;
+      modalHead.innerHTML = '<img class="real-skin-img" src="https://mc-heads.net/avatar/Vortexious/80" alt="Vortexious current Minecraft skin">';
+      modalPlacement.textContent = 'PLAYER PROFILE';
+      modalPlacementStat.textContent = 'Unranked';
+      modalName.textContent = 'Vortexious';
+      modalMeta.textContent = 'Combat Cadet';
+      modalPoints.textContent = String(points);
+      modalTiers.innerHTML = tiers.map(([mode,tier]) =>
+        '<div class="tierrow"><div class="mode-line"><span class="mode-icon mode-' + mode + '"></span></div><div class="badge tier-' + tier.toLowerCase() + '">' + tier + '</div></div>'
+      ).join('') + Array.from({length:3}, () =>
+        '<div class="tierrow"><div class="mode-line"></div><div class="badge"></div></div>'
+      ).join('');
+      sortProfileTiers(modalTiers);
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      document.body.classList.add('modal-open');
+      message.textContent = '';
+      return;
+    }
     const card = byName.get(query.toLowerCase());
     if (!card) {
       message.textContent = 'No exact player match found.';
