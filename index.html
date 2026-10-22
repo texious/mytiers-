@@ -3566,8 +3566,13 @@
       modalName.textContent = 'Vortexious';
       modalMeta.textContent = 'Combat Cadet';
       modalPoints.textContent = String(points);
+      const iconTemplates = {};
+      document.querySelectorAll('#overall .profile .mode-icon').forEach(icon => {
+        const mode = Array.from(icon.classList).find(c => c.startsWith('mode-') && c !== 'mode-icon');
+        if (mode && !iconTemplates[mode]) iconTemplates[mode] = icon.innerHTML;
+      });
       modalTiers.innerHTML = tiers.map(([mode,tier]) =>
-        '<div class="tierrow"><div class="mode-line"><span class="mode-icon mode-' + mode + '"></span></div><div class="badge tier-' + tier.toLowerCase() + '">' + tier + '</div></div>'
+        '<div class="tierrow"><div class="mode-line"><span class="mode-icon mode-' + mode + '">' + (iconTemplates['mode-' + mode] || '') + '</span></div><div class="badge tier-' + tier.toLowerCase() + '">' + tier + '</div></div>'
       ).join('') + Array.from({length:3}, () =>
         '<div class="tierrow"><div class="mode-line"></div><div class="badge"></div></div>'
       ).join('');
