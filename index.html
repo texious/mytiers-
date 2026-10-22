@@ -3612,6 +3612,35 @@
       message.textContent = '';
       return;
     }
+    if (query.toLowerCase() === 'airokun') {
+      const tiers = [
+        ['sword','HT3'], ['axe','LT2'], ['uhc','HT2'], ['smp','HT3'],
+        ['pot','HT3'], ['nethop','HT3'], ['mace','LT3'], ['vanilla','LT3']
+      ];
+      const points = 10 + 20 + 30 + 10 + 10 + 10 + 6 + 6;
+      modalHead.innerHTML = '<img class="real-skin-img" src="https://mc-heads.net/avatar/airokun/80" alt="airokun current Minecraft skin">';
+      modalPlacement.textContent = 'PLAYER PROFILE';
+      modalPlacementStat.textContent = 'Unranked';
+      modalName.textContent = 'airokun';
+      modalMeta.textContent = 'Combat Ace';
+      modalPoints.textContent = String(points);
+      const iconTemplates = {};
+      document.querySelectorAll('#overall .profile .mode-icon').forEach(icon => {
+        const mode = Array.from(icon.classList).find(c => c.startsWith('mode-') && c !== 'mode-icon');
+        if (mode && !iconTemplates[mode]) iconTemplates[mode] = icon.innerHTML;
+      });
+      modalTiers.innerHTML = tiers.map(([mode,tier]) =>
+        '<div class="tierrow"><div class="mode-line"><span class="mode-icon mode-' + mode + '">' +
+        (iconTemplates['mode-' + mode] || '') + '</span></div><div class="badge tier-' +
+        tier.toLowerCase() + '">' + tier + '</div></div>'
+      ).join('');
+      sortProfileTiers(modalTiers);
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      document.body.classList.add('modal-open');
+      message.textContent = '';
+      return;
+    }
     const card = byName.get(query.toLowerCase());
     if (!card) {
       message.textContent = 'No exact player match found.';
