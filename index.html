@@ -3583,6 +3583,35 @@
       message.textContent = '';
       return;
     }
+    if (query.toLowerCase() === 'immixed') {
+      const tiers = [
+        ['sword','HT3',false], ['uhc','HT3',false], ['smp','LT2',true],
+        ['pot','LT3',false], ['mace','HT3',false], ['nethop','LT3',false],
+        ['axe','LT3',false], ['vanilla','LT3',false]
+      ];
+      modalHead.innerHTML = '<img class="real-skin-img" src="https://mc-heads.net/avatar/ImMixed/80" alt="ImMixed current Minecraft skin">';
+      modalPlacement.textContent = 'PLAYER PROFILE';
+      modalPlacementStat.textContent = 'Unranked';
+      modalName.textContent = 'ImMixed';
+      modalMeta.textContent = 'Combat Specialist';
+      modalPoints.textContent = '74';
+      const iconTemplates = {};
+      document.querySelectorAll('#overall .profile .mode-icon').forEach(icon => {
+        const mode = Array.from(icon.classList).find(c => c.startsWith('mode-') && c !== 'mode-icon');
+        if (mode && !iconTemplates[mode]) iconTemplates[mode] = icon.innerHTML;
+      });
+      modalTiers.innerHTML = tiers.map(([mode,tier,retired]) =>
+        '<div class="tierrow"><div class="mode-line"><span class="mode-icon mode-' + mode + '">' +
+        (iconTemplates['mode-' + mode] || '') + '</span></div><div class="badge tier-' +
+        tier.toLowerCase() + (retired ? ' retired-tier' : '') + '">' + tier + '</div></div>'
+      ).join('');
+      sortProfileTiers(modalTiers);
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      document.body.classList.add('modal-open');
+      message.textContent = '';
+      return;
+    }
     const card = byName.get(query.toLowerCase());
     if (!card) {
       message.textContent = 'No exact player match found.';
